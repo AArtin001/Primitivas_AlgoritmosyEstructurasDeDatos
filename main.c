@@ -4,7 +4,163 @@
 #define OK 0
 #define ERROR 1
 
-int main(){
+/*************************CASOS DE PRUEBA LISTA DINAMICA*************************/
+#define ASSERT(msg, cond) \
+    printf("%s: %s\n", msg, (cond) ? "OK" : "FAIL");
+
+// Comparación de enteros
+int cmpEnteros(void *a, void *b)
+{
+    int x = *(int*)a;
+    int y = *(int*)b;
+
+    if(x < y) return -1;
+    if(x > y) return 1;
+    return 0;
+}
+
+// Acción si la clave ya existe (sumo valores por ejemplo)
+int accionSumar(void *dest, void *src)
+{
+    *(int*)dest += *(int*)src;
+    return OK;
+}
+
+int printInt(void* a, void* b){
+    printf("%d\n", *(int*)a);
+    return OK;
+}
+
+int main()
+{
+    tLista lista;
+    int r, x, aux;
+
+    printf("==== CASOS DE PRUEBA LISTA DINÁMICA ====\n\n");
+
+    // ---------------------------------------------------------
+    // 1) Crear lista (debe quedar vacía)
+    // ---------------------------------------------------------
+    crearLista(&lista);
+    ASSERT("1. Lista recién creada debe estar vacía", listaVacia(&lista) == 0);
+
+
+    // ---------------------------------------------------------
+    // 2) Insertar primero en lista vacía
+    // ---------------------------------------------------------
+    x = 50;
+    r = InsertarPrimeroEnLista(&lista, &x, sizeof(int));
+    ASSERT("2. InsertarPrimero en lista vacía", r == OK);
+    ASSERT("3. Lista NO vacía luego de insertar", listaVacia(&lista) == 1);
+
+    aux = 0;
+    verPrimeroLista(&lista, &aux, sizeof(int));
+    ASSERT("4. Primer elemento es 50", aux == 50);
+
+
+    // ---------------------------------------------------------
+    // 3) Insertar último
+    // ---------------------------------------------------------
+    x = 80;
+    r = InsertarUltimoEnLista(&lista, &x, sizeof(int));
+    ASSERT("5. InsertarUltimo", r == OK);
+
+    aux = 0;
+    verUltimoLista(&lista, &aux, sizeof(int));
+    ASSERT("6. Último elemento es 80", aux == 80);
+
+
+    // ---------------------------------------------------------
+    // 4) Insertar ordenado
+    // ---------------------------------------------------------
+    x = 60;
+    r = InsertarOrdenadoEnLista(&lista, &x, sizeof(int), cmpEnteros, accionSumar);
+    ASSERT("7. InsertarOrdenado (60)", r == OK);
+
+    // Lista debería ser: 50 → 60 → 80
+    aux = 50;
+    verPorClaveLista(&lista, &aux, sizeof(int), &aux, cmpEnteros);
+    ASSERT("8. verPorClaveLista encuentra 50", aux == 50);
+
+    aux = 60;
+    r = verPorClaveLista(&lista, &aux, sizeof(int), &aux, cmpEnteros);
+    ASSERT("9. verPorClaveLista encuentra 60", r == OK);
+
+    aux = 80;
+    r = verPorClaveLista(&lista, &aux, sizeof(int), &aux, cmpEnteros);
+    ASSERT("10. verPorClaveLista encuentra 80", r == OK);
+
+    printf("\nRecorro lista imprimiendo los valores:\n");
+    recorrerLista(&lista, NULL, cmpEnteros, printInt);
+
+    // ---------------------------------------------------------
+    // 5) Insertar repetido para probar 'accion'
+    // ---------------------------------------------------------
+    x = 60;   // la clave ya existe
+    r = InsertarOrdenadoEnLista(&lista, &x, sizeof(int), cmpEnteros, accionSumar);
+    ASSERT("11. Insertar repetido (accionSumar)", r == OK);
+
+    aux = 120;
+    verPorClaveLista(&lista, &aux, sizeof(int), &aux, cmpEnteros);
+    ASSERT("12. El valor de 60 ahora es 120", aux == 120);
+
+    printf("\nRecorro lista imprimiendo los valores:\n");
+    recorrerLista(&lista, NULL, cmpEnteros, printInt);
+    // ---------------------------------------------------------
+    // 6) Ver primero y último
+    // ---------------------------------------------------------
+    aux = 0;
+    verPrimeroLista(&lista, &aux, sizeof(int));
+    ASSERT("13. Primero sigue siendo 50", aux == 50);
+
+    aux = 0;
+    verUltimoLista(&lista, &aux, sizeof(int));
+    ASSERT("14. Último sigue siendo 80", aux == 80);
+
+
+    // ---------------------------------------------------------
+    // 7) Sacar por clave
+    // ---------------------------------------------------------
+    x = 120;   // valor actual luego de sumar
+    r = sacarDeLista(&lista, &x, sizeof(int), cmpEnteros);
+    ASSERT("15. sacarDeLista(120)", r == OK);
+
+    // Ahora lista: 50 → 80
+    aux = 0;
+    verPrimeroLista(&lista, &aux, sizeof(int));
+    ASSERT("16. Primero sigue siendo 50", aux == 50);
+
+
+    // ---------------------------------------------------------
+    // 8) Sacar el primero
+    // ---------------------------------------------------------
+    x = 50;
+    r = sacarDeLista(&lista, &x, sizeof(int), cmpEnteros);
+    ASSERT("17. sacarDeLista(50)", r == OK);
+
+    // Lista: 80
+    aux = 0;
+    verPrimeroLista(&lista, &aux, sizeof(int));
+    ASSERT("18. Primer elemento ahora es 80", aux == 80);
+
+
+    // ---------------------------------------------------------
+    // 9) Sacar el último restante → queda vacía
+    // ---------------------------------------------------------
+    x = 80;
+    r = sacarDeLista(&lista, &x, sizeof(int), cmpEnteros);
+    ASSERT("19. sacarDeLista(80)", r == OK);
+    ASSERT("20. Lista vacía", listaVacia(&lista) == 0);
+
+
+    // ---------------------------------------------------------
+    // 10) destruirLista con lista vacía (no debe fallar)
+    // ---------------------------------------------------------
+    destruirLista(&lista);
+    ASSERT("21. destruir Lista en lista vacía no rompe nada", listaVacia(&lista) == 0);
+
+
+    printf("\n==== FIN DE PRUEBAS ====\n");
     return 0;
 }
 

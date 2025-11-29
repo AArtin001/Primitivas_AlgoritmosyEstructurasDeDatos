@@ -11,7 +11,7 @@ typedef tNodo *tLista;
 ///Firma de funciones
 int crearLista(tLista *pL);
 
-int InsertarPriemroEnLista(tLista *pL, void *info, unsigned tamInfo);
+int InsertarPrimeroEnLista(tLista *pL, void *info, unsigned tamInfo);
 
 int InsertarUltimoEnLista(tLista *pL, void *info, unsigned tamInfo);
 
@@ -23,7 +23,9 @@ int verPrimeroLista(tLista *pL, void *info, unsigned tamInfo);
 
 int verUltimoLista(tLista *pL, void *info, unsigned tamInfo);
 
-int verPorClaveLista(tLista *pL, void *info, unsigned tamInfo, int (*cmp)(void*, void*));
+int verPorClaveLista(tLista *pL, void *info, unsigned tamInfo, void* clave, int (*cmp)(void*, void*));
+
+int recorrerLista(tLista *pL, void* param, int (*cmp)(void*, void*), int(*accion)(void*, void*));
 
 int sacarDeLista(tLista *pL, void *info, unsigned tamInfo, int (*cmp)(void*, void*));
 

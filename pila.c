@@ -33,21 +33,21 @@ int InsertarEnPila(tPila *pP, void *info, unsigned tamInfo){
 
 int pilaLlena(unsigned tamInfo){
 
-    void *nuevo = malloc(sizeof(tNodo));
+    tNodo *nuevo = (tNodo*)malloc(sizeof(tNodo));
     if(!nuevo){
         printf("\nNo hay memoria para el nodo");
         return ERROR;
     }
 
-    void *info = malloc(tamInfo);
-    if(!info){
+    nuevo->info = malloc(tamInfo);
+    if(!nuevo->info){
         printf("\nNo hay memoria para la info");
         free(nuevo);
         return ERROR;
     }
 
+    free(nuevo->info);
     free(nuevo);
-    free(info);
     return TODOBIEN;
 }
 
